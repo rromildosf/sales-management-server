@@ -21,6 +21,7 @@ const create = ( req, res ) => {
     
 }
 
+
 const product = (req, res) => {
     id = validateId(req.params.id)
     if( id == NaN )
@@ -77,8 +78,7 @@ const validateId = (id) => {
 
 const check = (req) => {
     nReq = {}
-    for( let i in req ){
-        console.log(req[i]==undefined);
+    for( let i in req ){ // UPDATE **
         if( req[i] == undefined || req[i] == 'undefined' )
             nReq[i] = null
         else nReq[i] = req[i]

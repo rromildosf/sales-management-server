@@ -15,4 +15,16 @@ con.connect((err)=> {
     console.log(`Connected to ${con.host}`);
 })
 
-module.exports = con;
+const makeQuery = ( query ) => {
+    return new Promise( (res, rej) => {
+        con.query(query, (err, result) => {
+            if(err) rej(err)
+            else res(result)
+        })
+    })
+}
+
+module.exports = {
+    con,
+    makeQuery
+};

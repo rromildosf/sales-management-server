@@ -7,22 +7,17 @@ const dba = require('../dba/dba')
  * @param {number} page pagination, used with limit (not implemented)
  */
 const getAll = (allFields, limit, page) => {
-    query = `SELECT ${allFields ? '*' : 'name, description, price, quantity'}
+    const query = `SELECT ${allFields ? '*' : 'name, description, price, quantity'}
             FROM products`
-    return new Promise((res, rej) => {
-        dba.query(query, (err, result) => {
-            if (err) rej(err)
-            else res(result)
-        })
-    })
+    return dba.makeQuery(query)
 }
 /**
  * Return a product identified by id
  * @param {int} id product id
  */
 const getProduct = (id) => {
-    query = `SELECT * FROM products WHERE id = ${id}`
-    return makeQuery(query)
+    const query = `SELECT * FROM products WHERE id = ${id}`
+    return dba.makeQuery(query)
 }
 
 /**
@@ -39,8 +34,8 @@ const getProduct = (id) => {
  * }
  */
 const create = (product) => {
-    prod = parseProduct(product)
-    query = `INSERT INTO products (name, price, quantity, description, commission, barcode, image)
+    const prod = parseProduct(product)
+    const query = `INSERT INTO products (name, price, quantity, description, commission, barcode, image)
             VALUES ( 
                 ${prod.name},
                 ${prod.price},
@@ -50,7 +45,7 @@ const create = (product) => {
                 ${prod.barcode},
                 ${prod.image}
             )`
-    return makeQuery(query)
+    return dba.makeQuery(query)
 }
 
 /**
@@ -59,9 +54,9 @@ const create = (product) => {
  * @param {Product} product 
  */
 const update = (id, product) => {
-    prod = parseProduct(product)
+    const prod = parseProduct(product)
     
-    query = `UPDATE products 
+    const query = `UPDATE products 
                 SET name=${prod.name},
                     price=${prod.price},
                     quantity=${prod.quantity},
@@ -71,7 +66,7 @@ const update = (id, product) => {
                     image=${prod.image}
                 WHERE id = ${id}`
     
-    return makeQuery(query)
+    return dba.makeQuery(query)
 }
 
 /**
@@ -79,18 +74,9 @@ const update = (id, product) => {
  * @param {int} id product id
  */
 const remove = (id) => {
-    query = `DELETE from products WHERE id = ${id}`
+    const query = `DELETE FROM products WHERE id = ${id}`
 
-    return makeQuery(query)
-}
-
-const makeQuery = ( query ) => {
-    return new Promise( (res, rej) => {
-        dba.query(query, (err, result) => {
-            if(err) rej(err)
-            else res(result)
-        })
-    })
+    return dba.makeQuery(query)
 }
 
 const parseProduct = (product) => {
