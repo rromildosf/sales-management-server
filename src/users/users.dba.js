@@ -1,13 +1,19 @@
 const dba = require('../dba/dba')
+const addrDba = require('../address/address.dba')
 
-const create = (user) => {
+const create = async (user) => {
     const u = parseUser(user)
 
-    const query = `INSERT INTO users (name, password, uid, email, image, access_level, address)
+    const addrRes = await addrDba.create(user.address)
+    const address = addrRes.insertId
+
+    const query = `
+            INSERT INTO users (name, password, uid, email, image, access_level, address)
             VALUES (
                 ${u.name}, ${u.password}, ${u.uid}, ${u.email}, 
-                ${u.image}, ${u.access_level}, ${u.address}
-            )`
+                ${u.image}, ${u.access_level}, ${address})`
+    console.log(query);
+    
     return dba.makeQuery(query)
 }
 
@@ -23,14 +29,16 @@ const getAll = (limit, page) => {
 }
 
 const parseUser = (user) => {
+    console.log(user);
+    
     return {
-        name: `'${user.name}'`,
-        email: `'${user.email}'`,
-        uid: `'${user.email}'`,
+        name : user.name ? `'${user.name}'`: null,
+        email: user.email ? `'${user.email}'`: null,
+        uid  : user.uid ? `'${user.uid}'`: null,
         address: parseInt(user.address) && !isNaN(user.address) ? parseInt(user.address): null,
-        password: `'${user.password}'`,
-        image: `'${user.image}'`,
-        address: parseInt(user.address) && !isNaN(user.access_level) ?
+        password: user.password ? `'${user.password}'` : null,
+        image: user.image ? `'${user.image}'` : null,
+        access_level: parseInt(user.access_level) && !isNaN(user.access_level) ?
                  parseInt(user.access_level) : null
     }
 }
@@ -38,5 +46,7 @@ const parseUser = (user) => {
 
 module.exports = {
     create,
-    getAll
+    getAll,
+
+    parseUser
 }

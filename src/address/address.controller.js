@@ -4,7 +4,7 @@ const dba = require('./address.dba')
 const create = async (req, res) => {
     try {
         const result = await dba.create(req.body);
-        res.send({ message: 'Address created with success!' });
+        res.send({ message: 'Address created successfully!', result });
     }
     catch (err) {
         res.status(400).send({
@@ -36,7 +36,7 @@ const update = async (req, res) => {
     try {
         const addr = req.body
         const result = await dba.update(addr.id, addr);
-        res.send({ message: 'Address updated with success!' });
+        res.send({ message: 'Address updated successfully!' });
     }
     catch (err) {
         res.status(400).send({
@@ -48,7 +48,7 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
     try {
         const result = await dba.remove(req.body);
-        res.send({ message: 'Address removed with success!' });
+        res.send({ message: 'Address removed successfully!' });
     }
     catch (err) {
         res.status(400).send({
