@@ -5,6 +5,7 @@ const usersRouter = require('./users/users.routes')
 const addrsRouter = require('./address/address.routes')
 const customersRouter = require('./customers/customers.routes')
 const sellersRouter = require('./sellers/sellers.routes')
+const ordersRouter = require('./orders/orders.routes')
 
 router.use((req, res, next) => {
     console.log('Router on routes')
@@ -12,6 +13,7 @@ router.use((req, res, next) => {
 })
 
 router
+    .use('/orders', ordersRouter)
     .use('/products', productsRouter)
     .use('/customers', customersRouter)
     .use('/sellers', sellersRouter)

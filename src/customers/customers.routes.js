@@ -5,6 +5,7 @@ const ctrl = require('./customers.controller')
 
 router
     .get('/', ctrl.getAll)
+    .get('/search', ctrl.search)
     .get('/:id', ctrl.get)
     .post('/', ctrl.create)
     .put('/:id', ctrl.update)

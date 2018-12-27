@@ -85,7 +85,7 @@ const parseProduct = (product) => {
         price: product.price,
         quantity: product.quantity || null,
         description: product.description ? `'${product.description}'` : null,
-        commission: product.commission || -1,
+        commission: product.commission || null,
         barcode: product.barcode ? `'${product.barcode}'` : null,
         image: product.image ? `'${product.image}'`: null
     }   

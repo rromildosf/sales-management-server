@@ -12,9 +12,10 @@ const create = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-
     try {
-        result = await dba.getAll(req.params.limit, req.params.page)
+        const limit = req.query.limit
+        const page = req.query.page
+        const result = await dba.getAll(limit, page)
         res.send(result)
     } catch (err) {
         res.status(400).send({
@@ -59,10 +60,16 @@ const remove = async (req, res) => {
     }
 }
 
+const search = async (req, res) => {
+    query = req.query
+
+}
+
 module.exports = {
     create,
     getAll,
     get,
     update,
     remove,
+    search
 }
