@@ -7,11 +7,6 @@ const customersRouter = require('./customers/customers.routes')
 const sellersRouter = require('./sellers/sellers.routes')
 const ordersRouter = require('./orders/orders.routes')
 
-router.use((req, res, next) => {
-    console.log('Router on routes')
-    next()
-})
-
 router
     .use('/orders', ordersRouter)
     .use('/products', productsRouter)

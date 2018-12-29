@@ -5,7 +5,8 @@ const ctrl = require('./orders.controller')
 router
     .get('/', ctrl.getAll)
     .get('/:id', ctrl.get)
+
     .post('/', ctrl.create)
     .put('/:id', ctrl.update)
 
-module.exports = router
+module.exports = router // 

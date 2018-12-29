@@ -3,7 +3,6 @@ const bodyParser = require('body-parser')
 const router = require('./routes')
 const port = 3000
 
-
 // support parsing of application/json type post data
 app.use(bodyParser.json());
 

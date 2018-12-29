@@ -1,4 +1,5 @@
 'use strict'
+const assert = require('assert').strict
 const dba = require('../dba/dba')
 const customerDba = require('../customers/customers.routes')
 const sellerDba = require('../sellers/sellers.dba')
@@ -34,7 +35,7 @@ const create = async (order) => {
 
         /* Insert order details */
         let productsQuery = `INSERT INTO order_products 
-            (product_id, **algo_mais_para_erro**, quantity, order_id, observation, price, commission)
+            (product_id, quantity, order_id, observation, price, commission)
             `
         productsQuery += item.products.map(p =>
             `(SELECT id, ${p.quantity}, ${orderId}, ${p.observation}, price, commission
@@ -53,8 +54,68 @@ const create = async (order) => {
     }
 }
 
-const getAll = (data) => {
+const getCustomerOrders = (id, limit, page, date) => {
+    return getOrdersFrom('customers', id, 'customer_id', limit, page, date)
+}
+
+const getSellerOrders = (id, limit, page, date) => {
+    return getOrdersFrom('sellers', id, 'seller_id', limit, page, date)
+}
+
+const getOrdersFrom = async (table, id, idName, limit, page, date) => {
+    const q = `
+        SELECT * FROM orders
+        WHERE ${idName}=${id} ORDER BY id` // TODO: limit and date
+    let orders = await dba.makeQuery(q)
+    if( orders.length == 0 ) return []
+
+    const orderIds = orders.map(order => order.id).join(',')
+    const products = await getOrdersProducts( orderIds )
+    let productIndex = 0 // used to avoid re-check on same order_product (improves performance)
+    orders = orders.map( order => {
+        let orderProducts = []
+        
+        while( productIndex < products.length && products[productIndex].order_id == order.id) {
+            const product = products[productIndex++]
+            delete product.order_id
+            orderProducts.push(product)
+        }
+        order.products = orderProducts
+        return order
+    })
+    return orders
+}
+
+const getOrdersProducts = async (orderIds) => {
+    const q = `SELECT * FROM order_products WHERE order_id IN (${orderIds})`
+    return dba.makeQuery(q)
+}
+
+const getAll = async (limit, page, date) => {
+    const query = `
+        SELECT O.*, OP.product_id, OP.price, OP.quantity, OP.commission, OP.observation, OP.product_id
+        FROM orders as O 
+        INNER JOIN order_products as OP ON O.id=OP.order_id`
+
+    let orders = await dba.makeQuery(query)
+
+    const productIds = orders.map( order => order.product_id ).join(',')
+    const prodQuery = `SELECT * FROM products WHERE id in (${productIds})`
+    const products = await dba.makeQuery(prodQuery)
+    const customerIds = orders.map(order => order.customer_id).join(',')
+    const customerQuery = `
+        SELECT * FROM customers AS C 
+        INNER JOIN users AS U ON C.userid=U.id AND C.id IN (${customerIds})`
+    const customers = await dba.makeQuery(customerQuery)
     
+    orders = orders.map(order => {
+        order.products = products.filter(p => order.product_id = p.id)
+        delete order.product_id
+        order.customer = customers.filter(c => c.id == order.customer_id )
+        delete order.customer_id
+        return order
+    })
+    return orders
 }
 const get = (data) => {
     
@@ -89,6 +150,8 @@ const parseProduct = (product) => {
 }
 
 module.exports = {
+    getCustomerOrders,
+    getSellerOrders,
     getAll,
     get,
     create,
